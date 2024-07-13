@@ -80,7 +80,7 @@ func updateUser(ctx context.Context, client desc.UserV1Client) {
 	if err != nil {
 		log.Fatalf("failed to update user: %v", err)
 	}
-	log.Printf(color.RedString("Update user.\n"))
+	log.Print(color.RedString("Update user.\n"))
 }
 
 func deleteUser(ctx context.Context, client desc.UserV1Client) {
@@ -90,5 +90,5 @@ func deleteUser(ctx context.Context, client desc.UserV1Client) {
 	if err != nil {
 		log.Fatalf("failed to delete user: %v", err)
 	}
-	log.Printf(color.RedString("Delete user.\n"))
+	log.Print(color.RedString("Delete user.\n"))
 }
