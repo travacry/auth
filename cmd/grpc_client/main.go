@@ -14,7 +14,7 @@ import (
 
 const (
 	address = "localhost:50051"
-	userId  = 100001
+	userID  = 100001
 	pass    = "123"
 )
 
@@ -24,20 +24,26 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to connect to server: %v", err)
 	}
-	defer conn.Close()
+
+	defer func() {
+		err = conn.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 
 	client := desc.NewUserV1Client(conn)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	CreateUser(ctx, client)
-	GetUser(ctx, client)
-	UpdateUser(ctx, client)
-	DeleteUser(ctx, client)
+	createUser(ctx, client)
+	getUser(ctx, client)
+	updateUser(ctx, client)
+	deleteUser(ctx, client)
 }
 
-func CreateUser(ctx context.Context, client desc.UserV1Client) {
+func createUser(ctx context.Context, client desc.UserV1Client) {
 	createRequest, err := client.Create(ctx, &desc.CreateRequest{
 		Info: &desc.UserInfo{
 			Name:  gofakeit.Name(),
@@ -54,18 +60,18 @@ func CreateUser(ctx context.Context, client desc.UserV1Client) {
 	log.Printf(color.RedString("Create user:\n"), color.GreenString("%+d", createRequest.GetId()))
 }
 
-func GetUser(ctx context.Context, client desc.UserV1Client) {
-	getRequest, err := client.Get(ctx, &desc.GetRequest{Id: userId})
+func getUser(ctx context.Context, client desc.UserV1Client) {
+	getRequest, err := client.Get(ctx, &desc.GetRequest{Id: userID})
 	if err != nil {
 		log.Fatalf("failed to get user by id: %v", err)
 	}
 	log.Printf(color.RedString("Get user:\n"), color.GreenString("%+v", getRequest.GetUser()))
 }
 
-func UpdateUser(ctx context.Context, client desc.UserV1Client) {
+func updateUser(ctx context.Context, client desc.UserV1Client) {
 	_, err := client.Update(ctx, &desc.UpdateRequest{
 		Info: &desc.UpdateUserInfo{
-			Id:    userId,
+			Id:    userID,
 			Name:  wrapperspb.String(gofakeit.Name()),
 			Email: wrapperspb.String(gofakeit.Email()),
 			Role:  desc.Role_USER,
@@ -77,9 +83,9 @@ func UpdateUser(ctx context.Context, client desc.UserV1Client) {
 	log.Printf(color.RedString("Update user.\n"))
 }
 
-func DeleteUser(ctx context.Context, client desc.UserV1Client) {
+func deleteUser(ctx context.Context, client desc.UserV1Client) {
 	_, err := client.Delete(ctx, &desc.DeleteRequest{
-		Id: userId,
+		Id: userID,
 	})
 	if err != nil {
 		log.Fatalf("failed to delete user: %v", err)
