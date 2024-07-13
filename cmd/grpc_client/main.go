@@ -2,14 +2,15 @@ package main
 
 import (
 	"context"
+	"log"
+	"time"
+
 	"github.com/brianvoe/gofakeit"
 	"github.com/fatih/color"
 	desc "github.com/travacry/auth/pkg/user_v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/wrapperspb"
-	"log"
-	"time"
 )
 
 const (
