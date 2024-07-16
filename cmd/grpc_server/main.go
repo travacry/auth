@@ -1,17 +1,16 @@
 package main
 
 import (
-	"context"
 	"fmt"
-	"log"
-	"net"
-
 	"github.com/brianvoe/gofakeit"
 	"github.com/fatih/color"
 	"github.com/golang/protobuf/ptypes/empty"
+	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"log"
+	"net"
 
 	desc "github.com/travacry/auth/pkg/user_v1"
 )
@@ -43,7 +42,7 @@ func (s *server) Get(_ context.Context, req *desc.GetRequest) (*desc.GetResponse
 			Info: &desc.UserInfo{
 				Name:  gofakeit.Name(),
 				Email: gofakeit.Email(),
-				Role:  desc.Role_USER,
+				Role:  desc.Role_user,
 			},
 			CreateAt: timestamppb.New(gofakeit.Date()),
 			UpdateAt: timestamppb.New(gofakeit.Date()),

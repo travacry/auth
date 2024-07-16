@@ -1,16 +1,16 @@
 package main
 
 import (
-	"context"
-	"log"
-	"time"
-
 	"github.com/brianvoe/gofakeit"
 	"github.com/fatih/color"
-	desc "github.com/travacry/auth/pkg/user_v1"
+	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/wrapperspb"
+	"log"
+	"time"
+
+	desc "github.com/travacry/auth/pkg/user_v1"
 )
 
 const (
@@ -49,7 +49,7 @@ func createUser(ctx context.Context, client desc.UserV1Client) {
 		Info: &desc.UserInfo{
 			Name:  gofakeit.Name(),
 			Email: gofakeit.Email(),
-			Role:  desc.Role_USER,
+			Role:  desc.Role_user,
 		},
 		Password:        pass,
 		PasswordConfirm: pass,
@@ -75,7 +75,7 @@ func updateUser(ctx context.Context, client desc.UserV1Client) {
 			Id:    userID,
 			Name:  wrapperspb.String(gofakeit.Name()),
 			Email: wrapperspb.String(gofakeit.Email()),
-			Role:  desc.Role_USER,
+			Role:  desc.Role_user,
 		},
 	})
 	if err != nil {
