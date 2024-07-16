@@ -23,13 +23,13 @@ func main() {
 
 	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatalf("failed to connect to server: %v", err)
+		log.Panicf("failed to connect to server: %v", err)
 	}
 
 	defer func() {
 		err = conn.Close()
 		if err != nil {
-			log.Fatal(err)
+			log.Panic(err)
 		}
 	}()
 
@@ -56,7 +56,8 @@ func createUser(ctx context.Context, client desc.UserV1Client) {
 	})
 
 	if err != nil {
-		log.Fatalf("failed to get user by id: %v", err)
+		log.Printf("failed to get user by id: %v", err)
+		return
 	}
 	log.Printf(color.RedString("Create user:\n"), color.GreenString("%+d", createRequest.GetId()))
 }
@@ -64,7 +65,8 @@ func createUser(ctx context.Context, client desc.UserV1Client) {
 func getUser(ctx context.Context, client desc.UserV1Client) {
 	getRequest, err := client.Get(ctx, &desc.GetRequest{Id: userID})
 	if err != nil {
-		log.Fatalf("failed to get user by id: %v", err)
+		log.Printf("failed to get user by id: %v", err)
+		return
 	}
 	log.Printf(color.RedString("Get user:\n"), color.GreenString("%+v", getRequest.GetUser()))
 }
@@ -79,7 +81,8 @@ func updateUser(ctx context.Context, client desc.UserV1Client) {
 		},
 	})
 	if err != nil {
-		log.Fatalf("failed to update user: %v", err)
+		log.Printf("failed to update user: %v", err)
+		return
 	}
 	log.Print(color.RedString("Update user.\n"))
 }
@@ -89,7 +92,8 @@ func deleteUser(ctx context.Context, client desc.UserV1Client) {
 		Id: userID,
 	})
 	if err != nil {
-		log.Fatalf("failed to delete user: %v", err)
+		log.Printf("failed to delete user: %v", err)
+		return
 	}
 	log.Print(color.RedString("Delete user.\n"))
 }
