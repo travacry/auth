@@ -68,7 +68,7 @@ func (s *server) Delete(_ context.Context, req *desc.DeleteRequest) (*empty.Empt
 func main() {
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		log.Panicf("failed to listen: %v", err)
 	}
 
 	s := grpc.NewServer()
@@ -78,6 +78,6 @@ func main() {
 	log.Printf("server listening at %v", lis.Addr())
 
 	if err = s.Serve(lis); err != nil {
-		log.Panicf("failed to serve: %v", err)
+		log.Printf("failed to serve: %v", err)
 	}
 }
