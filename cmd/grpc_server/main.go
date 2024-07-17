@@ -23,7 +23,7 @@ type server struct {
 
 func (s *server) Create(_ context.Context, req *desc.CreateRequest) (*desc.CreateResponse, error) {
 
-	log.Printf(color.RedString("Create User:\n"),
+	fmt.Printf(color.RedString("Create User:\n"),
 		color.GreenString("info : %+v, pass : %s, cpass : %s", req.GetInfo(), req.GetPassword(), req.GetPasswordConfirm()))
 
 	return &desc.CreateResponse{
@@ -33,8 +33,7 @@ func (s *server) Create(_ context.Context, req *desc.CreateRequest) (*desc.Creat
 
 func (s *server) Get(_ context.Context, req *desc.GetRequest) (*desc.GetResponse, error) {
 
-	log.Printf(color.RedString("Get User:\n"),
-		color.GreenString("info : %d", req.GetId()))
+	fmt.Printf(color.RedString("Get User:\n"), color.GreenString("info : %d", req.GetId()))
 
 	return &desc.GetResponse{
 		User: &desc.User{
@@ -52,7 +51,7 @@ func (s *server) Get(_ context.Context, req *desc.GetRequest) (*desc.GetResponse
 
 func (s *server) Update(_ context.Context, req *desc.UpdateRequest) (*empty.Empty, error) {
 
-	log.Printf(color.RedString("Update User:\n"),
+	fmt.Printf(color.RedString("Update User:\n"),
 		color.GreenString("info : %+v", req.GetInfo()))
 
 	return &empty.Empty{}, nil
@@ -60,7 +59,7 @@ func (s *server) Update(_ context.Context, req *desc.UpdateRequest) (*empty.Empt
 
 func (s *server) Delete(_ context.Context, req *desc.DeleteRequest) (*empty.Empty, error) {
 
-	log.Printf(color.RedString("Delete User:\n"),
+	fmt.Printf(color.RedString("Delete User:\n"),
 		color.GreenString("info : %+v", req.GetId()))
 
 	return &empty.Empty{}, nil
