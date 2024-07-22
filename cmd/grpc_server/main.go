@@ -23,7 +23,6 @@ type server struct {
 }
 
 func (s *server) Create(_ context.Context, req *desc.CreateRequest) (*desc.CreateResponse, error) {
-
 	fmt.Print(color.RedString("Create: "))
 	fmt.Print(color.GreenString("%+v, pass : %s, cpass : %s\n", req.GetInfo(), req.GetPassword(), req.GetPasswordConfirm()))
 
@@ -33,7 +32,6 @@ func (s *server) Create(_ context.Context, req *desc.CreateRequest) (*desc.Creat
 }
 
 func (s *server) Get(_ context.Context, req *desc.GetRequest) (*desc.GetResponse, error) {
-
 	fmt.Print(color.RedString("Get: "))
 	fmt.Print(color.GreenString("%d\n", req.GetId()))
 
@@ -52,7 +50,6 @@ func (s *server) Get(_ context.Context, req *desc.GetRequest) (*desc.GetResponse
 }
 
 func (s *server) Update(_ context.Context, req *desc.UpdateRequest) (*empty.Empty, error) {
-
 	fmt.Print(color.RedString("Update: "))
 	fmt.Print(color.GreenString("%v\n", req.GetInfo()))
 
@@ -60,7 +57,6 @@ func (s *server) Update(_ context.Context, req *desc.UpdateRequest) (*empty.Empt
 }
 
 func (s *server) Delete(_ context.Context, req *desc.DeleteRequest) (*empty.Empty, error) {
-
 	fmt.Print(color.RedString("Delete: "))
 	fmt.Print(color.GreenString("%d\n", req.GetId()))
 

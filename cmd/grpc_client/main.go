@@ -66,7 +66,6 @@ func main() {
 }
 
 func createUser(ctx context.Context, client desc.UserV1Client) (*desc.CreateResponse, error) {
-
 	createResponse, err := client.Create(ctx, &desc.CreateRequest{
 		Info: &desc.UserInfo{
 			Name:  gofakeit.Name(),
@@ -87,7 +86,6 @@ func createUser(ctx context.Context, client desc.UserV1Client) (*desc.CreateResp
 }
 
 func getUser(ctx context.Context, client desc.UserV1Client) (*desc.GetResponse, error) {
-
 	getResponse, err := client.Get(ctx, &desc.GetRequest{Id: userID})
 
 	if err != nil {
