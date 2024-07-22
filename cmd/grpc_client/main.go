@@ -2,14 +2,15 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"time"
+
 	"github.com/brianvoe/gofakeit"
 	"github.com/fatih/color"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/wrapperspb"
-	"log"
-	"time"
 
 	desc "github.com/travacry/auth/pkg/user_v1"
 )
