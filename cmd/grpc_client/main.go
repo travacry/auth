@@ -66,7 +66,7 @@ func main() {
 
 func createUser(ctx context.Context, client desc.UserV1Client) (*desc.CreateResponse, error) {
 
-	createRequest, err := client.Create(ctx, &desc.CreateRequest{
+	createResponse, err := client.Create(ctx, &desc.CreateRequest{
 		Info: &desc.UserInfo{
 			Name:  gofakeit.Name(),
 			Email: gofakeit.Email(),
@@ -80,20 +80,22 @@ func createUser(ctx context.Context, client desc.UserV1Client) (*desc.CreateResp
 		return nil, fmt.Errorf("failed to create user: %v", err)
 	}
 
-	fmt.Printf(color.RedString("Create user:\n"), color.GreenString("%+d", createRequest.GetId()))
-	return createRequest, nil
+	fmt.Printf(color.RedString("Create user: "))
+	fmt.Printf(color.GreenString("%+d\n", createResponse.GetId()))
+	return createResponse, nil
 }
 
 func getUser(ctx context.Context, client desc.UserV1Client) (*desc.GetResponse, error) {
 
-	getRequest, err := client.Get(ctx, &desc.GetRequest{Id: userID})
+	getResponse, err := client.Get(ctx, &desc.GetRequest{Id: userID})
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user by id: %v", err)
 	}
 
-	fmt.Printf(color.RedString("Get user:\n"), color.GreenString("%+v", getRequest.GetUser()))
-	return getRequest, nil
+	fmt.Printf(color.RedString("Get user: "))
+	fmt.Printf(color.GreenString("%+v\n", getResponse.GetUser()))
+	return getResponse, nil
 }
 
 func updateUser(ctx context.Context, client desc.UserV1Client) error {
