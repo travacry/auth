@@ -81,7 +81,7 @@ func createUser(ctx context.Context, client desc.UserV1Client) (*desc.CreateResp
 		return nil, fmt.Errorf("failed to create user: %v", err)
 	}
 
-	fmt.Printf(color.RedString("Create user: "))
+	fmt.Print(color.RedString("Create user: "))
 	fmt.Printf(color.GreenString("%+d\n", createResponse.GetId()))
 	return createResponse, nil
 }
@@ -94,7 +94,7 @@ func getUser(ctx context.Context, client desc.UserV1Client) (*desc.GetResponse, 
 		return nil, fmt.Errorf("failed to get user by id: %v", err)
 	}
 
-	fmt.Printf(color.RedString("Get user: "))
+	fmt.Print(color.RedString("Get user: "))
 	fmt.Printf(color.GreenString("%+v\n", getResponse.GetUser()))
 	return getResponse, nil
 }
