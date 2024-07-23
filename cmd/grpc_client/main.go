@@ -65,6 +65,22 @@ func main() {
 	}
 }
 
+func createUserError(err error) error {
+	return fmt.Errorf("failed to create user: %v", err)
+}
+
+func getUserError(err error) error {
+	return fmt.Errorf("failed to get user by id: %v", err)
+}
+
+func updateUserError(err error) error {
+	return fmt.Errorf("failed to update user: %v", err)
+}
+
+func deleteUserError(err error) error {
+	return fmt.Errorf("failed to delete user: %v", err)
+}
+
 func createUser(ctx context.Context, client desc.UserV1Client) (*desc.CreateResponse, error) {
 	createResponse, err := client.Create(ctx, &desc.CreateRequest{
 		Info: &desc.UserInfo{
@@ -77,7 +93,7 @@ func createUser(ctx context.Context, client desc.UserV1Client) (*desc.CreateResp
 	})
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to create user: %v", err)
+		return nil, createUserError(err)
 	}
 
 	fmt.Print(color.RedString("Create user: "))
@@ -89,7 +105,7 @@ func getUser(ctx context.Context, client desc.UserV1Client) (*desc.GetResponse, 
 	getResponse, err := client.Get(ctx, &desc.GetRequest{Id: userID})
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to get user by id: %v", err)
+		return nil, getUserError(err)
 	}
 
 	fmt.Print(color.RedString("Get user: "))
@@ -108,7 +124,7 @@ func updateUser(ctx context.Context, client desc.UserV1Client) error {
 	})
 
 	if err != nil {
-		return fmt.Errorf("failed to update user: %v", err)
+		return updateUserError(err)
 	}
 
 	fmt.Print(color.RedString("Update user.\n"))
@@ -121,7 +137,7 @@ func deleteUser(ctx context.Context, client desc.UserV1Client) error {
 	})
 
 	if err != nil {
-		return fmt.Errorf("failed to delete user: %v", err)
+		return deleteUserError(err)
 	}
 
 	fmt.Print(color.RedString("Delete user.\n"))
