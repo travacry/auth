@@ -26,7 +26,6 @@ func main() {
 	if err != nil {
 		log.Panicf("failed to connect to server: %v", err)
 	}
-
 	defer func() {
 		err = conn.Close()
 		if err != nil {
