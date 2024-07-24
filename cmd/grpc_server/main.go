@@ -65,7 +65,6 @@ func (s *server) Delete(_ context.Context, req *desc.DeleteRequest) (*empty.Empt
 
 func main() {
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
-
 	if err != nil {
 		log.Panicf("failed to listen: %v", err)
 	}

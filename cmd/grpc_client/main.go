@@ -38,27 +38,23 @@ func main() {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	// log.Printf("failed to get user by id: %v", err)
-	_, err = createUser(ctx, client)
 
+	_, err = createUser(ctx, client)
 	if err != nil {
 		log.Print(err)
 	}
 
 	_, err = getUser(ctx, client)
-
 	if err != nil {
 		log.Print(err)
 	}
 
 	err = updateUser(ctx, client)
-
 	if err != nil {
 		log.Print(err)
 	}
 
 	err = deleteUser(ctx, client)
-
 	if err != nil {
 		log.Print(err)
 	}
@@ -74,7 +70,6 @@ func createUser(ctx context.Context, client desc.UserV1Client) (*desc.CreateResp
 		Password:        pass,
 		PasswordConfirm: pass,
 	})
-
 	if err != nil {
 		return nil, createUserError(err)
 	}
@@ -89,7 +84,6 @@ func createUserError(err error) error {
 
 func getUser(ctx context.Context, client desc.UserV1Client) (*desc.GetResponse, error) {
 	getResponse, err := client.Get(ctx, &desc.GetRequest{Id: userID})
-
 	if err != nil {
 		return nil, getUserError(err)
 	}
@@ -111,7 +105,6 @@ func updateUser(ctx context.Context, client desc.UserV1Client) error {
 			Role:  desc.Role_user,
 		},
 	})
-
 	if err != nil {
 		return updateUserError(err)
 	}
@@ -127,7 +120,6 @@ func deleteUser(ctx context.Context, client desc.UserV1Client) error {
 	_, err := client.Delete(ctx, &desc.DeleteRequest{
 		Id: userID,
 	})
-
 	if err != nil {
 		return deleteUserError(err)
 	}
