@@ -3,15 +3,14 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
-	"net"
-
 	"github.com/brianvoe/gofakeit"
 	"github.com/fatih/color"
 	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"log"
+	"net"
 
 	desc "github.com/travacry/auth/pkg/user_v1"
 )
@@ -20,6 +19,23 @@ const grpcPort = 50051
 
 type server struct {
 	desc.UnimplementedUserV1Server
+}
+
+func main() {
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
+	if err != nil {
+		log.Panicf("failed to listen: %v", err)
+	}
+
+	s := grpc.NewServer()
+	reflection.Register(s)
+	desc.RegisterUserV1Server(s, &server{})
+
+	log.Printf("server listening at %v", lis.Addr())
+
+	if err = s.Serve(lis); err != nil {
+		log.Printf("failed to serve: %v", err)
+	}
 }
 
 func (s *server) Create(_ context.Context, req *desc.CreateRequest) (*desc.CreateResponse, error) {
@@ -61,21 +77,4 @@ func (s *server) Delete(_ context.Context, req *desc.DeleteRequest) (*empty.Empt
 	fmt.Print(color.GreenString("%d\n", req.GetId()))
 
 	return &empty.Empty{}, nil
-}
-
-func main() {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
-	if err != nil {
-		log.Panicf("failed to listen: %v", err)
-	}
-
-	s := grpc.NewServer()
-	reflection.Register(s)
-	desc.RegisterUserV1Server(s, &server{})
-
-	log.Printf("server listening at %v", lis.Addr())
-
-	if err = s.Serve(lis); err != nil {
-		log.Printf("failed to serve: %v", err)
-	}
 }
