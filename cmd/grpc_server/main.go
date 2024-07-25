@@ -3,14 +3,15 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
+	"net"
+
 	"github.com/brianvoe/gofakeit"
 	"github.com/fatih/color"
 	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"log"
-	"net"
 
 	desc "github.com/travacry/auth/pkg/user_v1"
 )
