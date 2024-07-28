@@ -9,23 +9,26 @@ import "google/protobuf/wrappers.proto";
 option go_package = "github.com/travacry/auth/pkg/user_v1;user_v1";
 
 service UserV1 {
+  // Создание пользователя
   rpc Create(CreateRequest) returns (CreateResponse);
-  rpc Delete(DeleteRequest) returns (google.protobuf.Empty);
+  // Получение информации о пользователе
   rpc Get(GetRequest) returns (GetResponse);
+  // Обновление информации о пользователе
   rpc Update(UpdateRequest) returns (google.protobuf.Empty);
+  // Удаление пользователя
+  rpc Delete(DeleteRequest) returns (google.protobuf.Empty);
 }
 
 message UpdateUserInfo {
   int64 id = 1;
   google.protobuf.StringValue name = 2;
-  google.protobuf.StringValue email = 3;
-  Role role = 4;
+  Role role = 3;
 }
 
 enum Role {
-  unknown = 0;
-  admin = 1;
-  user = 2;
+  UNKNOWN = 0;
+  ADMIN = 1;
+  USER = 2;
 }
 
 message User {

@@ -64,7 +64,7 @@ func createUser(ctx context.Context, client desc.UserV1Client) (*desc.CreateResp
 		Info: &desc.UserInfo{
 			Name:  gofakeit.Name(),
 			Email: gofakeit.Email(),
-			Role:  desc.Role_user,
+			Role:  desc.Role_USER,
 		},
 		Password:        pass,
 		PasswordConfirm: pass,
@@ -98,10 +98,9 @@ func getUserError(err error) error {
 func updateUser(ctx context.Context, client desc.UserV1Client) error {
 	_, err := client.Update(ctx, &desc.UpdateRequest{
 		Info: &desc.UpdateUserInfo{
-			Id:    userID,
-			Name:  wrapperspb.String(gofakeit.Name()),
-			Email: wrapperspb.String(gofakeit.Email()),
-			Role:  desc.Role_user,
+			Id:   userID,
+			Name: wrapperspb.String(gofakeit.Name()),
+			Role: desc.Role_USER,
 		},
 	})
 	if err != nil {

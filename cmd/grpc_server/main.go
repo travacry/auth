@@ -58,7 +58,7 @@ func (s *server) Get(_ context.Context, req *desc.GetRequest) (*desc.GetResponse
 			Info: &desc.UserInfo{
 				Name:  gofakeit.Name(),
 				Email: gofakeit.Email(),
-				Role:  desc.Role_user,
+				Role:  desc.Role_USER,
 			},
 			CreateAt: timestamppb.New(gofakeit.Date()),
 			UpdateAt: timestamppb.New(gofakeit.Date()),
