@@ -59,8 +59,8 @@ func main() {
 	}
 }
 
-func createUser(ctx context.Context, client desc.UserV1Client) (*desc.CreateResponse, error) {
-	createResponse, err := client.Create(ctx, &desc.CreateRequest{
+func createUser(ctx context.Context, client desc.UserV1Client) (*desc.CreateUserResponse, error) {
+	createResponse, err := client.CreateUser(ctx, &desc.CreateUserRequest{
 		Info: &desc.UserInfo{
 			Name:  gofakeit.Name(),
 			Email: gofakeit.Email(),
@@ -81,8 +81,8 @@ func createUserError(err error) error {
 	return fmt.Errorf("failed to create user: %v", err)
 }
 
-func getUser(ctx context.Context, client desc.UserV1Client) (*desc.GetResponse, error) {
-	getResponse, err := client.Get(ctx, &desc.GetRequest{Id: userID})
+func getUser(ctx context.Context, client desc.UserV1Client) (*desc.GetUserResponse, error) {
+	getResponse, err := client.GetUser(ctx, &desc.GetUserRequest{Id: userID})
 	if err != nil {
 		return nil, getUserError(err)
 	}
@@ -96,7 +96,7 @@ func getUserError(err error) error {
 }
 
 func updateUser(ctx context.Context, client desc.UserV1Client) error {
-	_, err := client.Update(ctx, &desc.UpdateRequest{
+	_, err := client.UpdateUser(ctx, &desc.UpdateUserRequest{
 		Info: &desc.UpdateUserInfo{
 			Id:   userID,
 			Name: wrapperspb.String(gofakeit.Name()),
@@ -115,7 +115,7 @@ func updateUserError(err error) error {
 }
 
 func deleteUser(ctx context.Context, client desc.UserV1Client) error {
-	_, err := client.Delete(ctx, &desc.DeleteRequest{
+	_, err := client.DeleteUser(ctx, &desc.DeleteUserRequest{
 		Id: userID,
 	})
 	if err != nil {

@@ -39,20 +39,20 @@ func main() {
 	}
 }
 
-func (s *server) Create(_ context.Context, req *desc.CreateRequest) (*desc.CreateResponse, error) {
+func (s *server) CreateUser(_ context.Context, req *desc.CreateUserRequest) (*desc.CreateUserResponse, error) {
 	fmt.Print(color.RedString("Create: "))
 	fmt.Print(color.GreenString("%+v, pass : %s, cpass : %s\n", req.GetInfo(), req.GetPassword(), req.GetPasswordConfirm()))
 
-	return &desc.CreateResponse{
+	return &desc.CreateUserResponse{
 		Id: gofakeit.Int64(),
 	}, nil
 }
 
-func (s *server) Get(_ context.Context, req *desc.GetRequest) (*desc.GetResponse, error) {
+func (s *server) GetUser(_ context.Context, req *desc.GetUserRequest) (*desc.GetUserResponse, error) {
 	fmt.Print(color.RedString("Get: "))
 	fmt.Print(color.GreenString("%d\n", req.GetId()))
 
-	return &desc.GetResponse{
+	return &desc.GetUserResponse{
 		User: &desc.User{
 			Id: req.GetId(),
 			Info: &desc.UserInfo{
@@ -66,14 +66,14 @@ func (s *server) Get(_ context.Context, req *desc.GetRequest) (*desc.GetResponse
 	}, nil
 }
 
-func (s *server) Update(_ context.Context, req *desc.UpdateRequest) (*empty.Empty, error) {
+func (s *server) UpdateUser(_ context.Context, req *desc.UpdateUserRequest) (*empty.Empty, error) {
 	fmt.Print(color.RedString("Update: "))
 	fmt.Print(color.GreenString("%v\n", req.GetInfo()))
 
 	return &empty.Empty{}, nil
 }
 
-func (s *server) Delete(_ context.Context, req *desc.DeleteRequest) (*empty.Empty, error) {
+func (s *server) DeleteUser(_ context.Context, req *desc.DeleteUserRequest) (*empty.Empty, error) {
 	fmt.Print(color.RedString("Delete: "))
 	fmt.Print(color.GreenString("%d\n", req.GetId()))
 

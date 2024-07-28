@@ -9,14 +9,10 @@ import "google/protobuf/wrappers.proto";
 option go_package = "github.com/travacry/auth/pkg/user_v1;user_v1";
 
 service UserV1 {
-  // Создание пользователя
-  rpc Create(CreateRequest) returns (CreateResponse);
-  // Получение информации о пользователе
-  rpc Get(GetRequest) returns (GetResponse);
-  // Обновление информации о пользователе
-  rpc Update(UpdateRequest) returns (google.protobuf.Empty);
-  // Удаление пользователя
-  rpc Delete(DeleteRequest) returns (google.protobuf.Empty);
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+  rpc GetUser(GetUserRequest) returns (GetUserResponse);
+  rpc UpdateUser(UpdateUserRequest) returns (google.protobuf.Empty);
+  rpc DeleteUser(DeleteUserRequest) returns (google.protobuf.Empty);
 }
 
 message UpdateUserInfo {
@@ -44,28 +40,28 @@ message UserInfo {
   Role role = 3;
 }
 
-message CreateRequest {
+message CreateUserRequest {
   UserInfo info = 1;
   string password = 2;
   string password_confirm = 3;
 }
 
-message CreateResponse {
+message CreateUserResponse {
   int64 id = 1;
 }
 
-message GetRequest {
+message GetUserRequest {
   int64 id = 1;
 }
 
-message GetResponse {
+message GetUserResponse {
   User user = 1;
 }
 
-message UpdateRequest {
+message UpdateUserRequest {
   UpdateUserInfo info = 1;
 }
 
-message DeleteRequest {
+message DeleteUserRequest {
   int64 id = 1;
 }
