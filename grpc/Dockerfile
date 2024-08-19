@@ -4,13 +4,13 @@ FROM golang:1.22.5-alpine AS builder
 WORKDIR /github.com/travacry/auth
 
 # Копируем файл go.mod и go.sum
-COPY go.mod go.sum ./grpc/
-
-# Копируем остальной код проекта
-COPY grpc/ ./grpc/
+COPY go.mod go.sum ./
 
 # Переход в директорию с исходным кодом
 WORKDIR /github.com/travacry/auth/grpc/
+
+# Копируем остальной код проекта
+COPY grpc/ ./grpc/
 
 # Настройка окружения
 ENV GO111MODULE=on
