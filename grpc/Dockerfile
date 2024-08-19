@@ -1,10 +1,8 @@
 FROM golang:1.22.5-alpine AS builder
 
+COPY .. /github.com/travacry/auth/grpc/source/
 # Устанавливаем рабочую директорию
 WORKDIR /github.com/travacry/auth/grpc/source/
-
-# Копируем файлы go.mod и go.sum в контейнер
-COPY go.mod go.sum ./
 
 # Настройка окружения
 ENV GO111MODULE=on
