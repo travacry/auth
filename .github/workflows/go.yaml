@@ -113,10 +113,13 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }} # Имя пользователя для SSH-подключения.
           key: ${{ secrets.SSHKEY }} # Приватный SSH-ключ для аутентификации. Хранится в секрете репозитория.
           known_hosts: ${{ secrets.KNOWN_HOSTS }} # Список известных хостов для предотвращения MITM-атак (атаки "человек посередине").
-          envs: IMAGE_NAME,${{ secrets.REGISTRY }},GITHUB_SHA,${{ secrets.CONTAINER_NAME }}# Передаем переменные окружения для использования в скрипте.
+          envs: IMAGE_NAME,${{ secrets.REGISTRY }},GITHUB_SHA,${{ secrets.CONTAINER_NAME }} # Передаем переменные окружения для использования в скрипте.
           script: |
             TAG_NAME=$(echo $GITHUB_SHA | head -c7) # Извлекаем первые 7 символов SHA коммита для использования в имени контейнера.
-            docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} ${{ secrets.REGISTRY }} # Входим в Docker Registry на сервере.
+
+            # Входим в Docker Registry на сервере, используя --password-stdin для передачи пароля безопасным образом.
+            echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login -u "${{ secrets.REGISTRY_USERNAME }}" --password-stdin ${{ secrets.REGISTRY }}
+
             docker stop ${{ secrets.CONTAINER_NAME }} # Останавливаем работающий контейнер.
             docker rm ${{ secrets.CONTAINER_NAME }} # Удаляем старый контейнер, чтобы освободить место для нового.
             docker run -d -p 50051:50051 --name ${{ secrets.CONTAINER_NAME }} -t ${{ secrets.REGISTRY }}/${{ secrets.IMAGE_NAME }}:$TAG_NAME # Запускаем новый контейнер из свежесобранного образа.
