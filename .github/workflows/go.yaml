@@ -88,7 +88,12 @@ jobs:
       # Вход в Docker Registry (регистр контейнеров) с использованием учетных данных, хранящихся в секретах репозитория.
       # Это необходимо для того, чтобы мы могли запушить (отправить) созданный Docker-образ в регистр.
       - name: Login to Docker Registry
-        run: docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} ${{ secrets.REGISTRY }}
+        env:
+          REGISTRY: ${{ secrets.REGISTRY }}
+          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+
+        run: echo $REGISTRY_PASSWORD | docker login -u $REGISTRY_USERNAME --password-stdin $REGISTRY || exit 1
 
       # Сборка и пуш Docker-образа. В этом шаге:
       # 1. Определяется тег для образа на основе первых 7 символов SHA коммита.
@@ -96,12 +101,18 @@ jobs:
       # 3. Docker-образ собирается и отправляется в регистр.
       # 4. Включено кэширование слоёв Docker для ускорения последующих сборок.
       - name: Build and Push Docker Image
+        env:
+          IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
+          REGISTRY: ${{ secrets.REGISTRY }}
+          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+
         run: |
           TAG_NAME=$(echo $GITHUB_SHA | head -c7) # Извлекаем первые 7 символов SHA коммита для создания тега образа.
           docker buildx create --use # Создаем и используем buildx-билдер.
-          docker buildx build --push --cache-from=type=registry,ref=${{ secrets.REGISTRY }}/${{ secrets.IMAGE_NAME }}:cache \ 
+          docker buildx build --push --cache-from=type=registry,ref=$REGISTRY/$IMAGE_NAME:cache \ 
           --cache-to=type=inline \ # Кэшируем слои Docker для использования в будущих сборках.
-          --tag ${{ secrets.REGISTRY }}/${{ secrets.IMAGE_NAME }}:$TAG_NAME -f Dockerfile .
+          --tag $REGISTRY/$IMAGE_NAME:$TAG_NAME -f Dockerfile .
 
   deploy-image:
     runs-on: ubuntu-latest
