@@ -9,17 +9,16 @@ import (
 	"github.com/brianvoe/gofakeit"
 	"github.com/fatih/color"
 	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/travacry/auth/grpc/pkg/user_v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/types/known/timestamppb"
-
-	desc "github.com/travacry/auth/pkg/user_v1"
 )
 
 const grpcPort = 50051
 
 type server struct {
-	desc.UnimplementedUserV1Server
+	user_v1.UnimplementedUserV1Server
 }
 
 func main() {
@@ -30,7 +29,7 @@ func main() {
 
 	s := grpc.NewServer()
 	reflection.Register(s)
-	desc.RegisterUserV1Server(s, &server{})
+	user_v1.RegisterUserV1Server(s, &server{})
 
 	log.Printf("server listening at %v", lis.Addr())
 
@@ -39,26 +38,26 @@ func main() {
 	}
 }
 
-func (s *server) CreateUser(_ context.Context, req *desc.CreateUserRequest) (*desc.CreateUserResponse, error) {
+func (s *server) CreateUser(_ context.Context, req *user_v1.CreateUserRequest) (*user_v1.CreateUserResponse, error) {
 	fmt.Print(color.RedString("Create: "))
 	fmt.Print(color.GreenString("%+v, pass : %s, cpass : %s\n", req.GetInfo(), req.GetPassword(), req.GetPasswordConfirm()))
 
-	return &desc.CreateUserResponse{
+	return &user_v1.CreateUserResponse{
 		Id: gofakeit.Int64(),
 	}, nil
 }
 
-func (s *server) GetUser(_ context.Context, req *desc.GetUserRequest) (*desc.GetUserResponse, error) {
+func (s *server) GetUser(_ context.Context, req *user_v1.GetUserRequest) (*user_v1.GetUserResponse, error) {
 	fmt.Print(color.RedString("Get: "))
 	fmt.Print(color.GreenString("%d\n", req.GetId()))
 
-	return &desc.GetUserResponse{
-		User: &desc.User{
+	return &user_v1.GetUserResponse{
+		User: &user_v1.User{
 			Id: req.GetId(),
-			Info: &desc.UserInfo{
+			Info: &user_v1.UserInfo{
 				Name:  gofakeit.Name(),
 				Email: gofakeit.Email(),
-				Role:  desc.Role_USER,
+				Role:  user_v1.Role_USER,
 			},
 			CreateAt: timestamppb.New(gofakeit.Date()),
 			UpdateAt: timestamppb.New(gofakeit.Date()),
@@ -66,14 +65,14 @@ func (s *server) GetUser(_ context.Context, req *desc.GetUserRequest) (*desc.Get
 	}, nil
 }
 
-func (s *server) UpdateUser(_ context.Context, req *desc.UpdateUserRequest) (*empty.Empty, error) {
+func (s *server) UpdateUser(_ context.Context, req *user_v1.UpdateUserRequest) (*empty.Empty, error) {
 	fmt.Print(color.RedString("Update: "))
 	fmt.Print(color.GreenString("%v\n", req.GetInfo()))
 
 	return &empty.Empty{}, nil
 }
 
-func (s *server) DeleteUser(_ context.Context, req *desc.DeleteUserRequest) (*empty.Empty, error) {
+func (s *server) DeleteUser(_ context.Context, req *user_v1.DeleteUserRequest) (*empty.Empty, error) {
 	fmt.Print(color.RedString("Delete: "))
 	fmt.Print(color.GreenString("%d\n", req.GetId()))
 

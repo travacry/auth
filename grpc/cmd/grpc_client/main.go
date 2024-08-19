@@ -8,11 +8,10 @@ import (
 
 	"github.com/brianvoe/gofakeit"
 	"github.com/fatih/color"
+	"github.com/travacry/auth/grpc/pkg/user_v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/wrapperspb"
-
-	desc "github.com/travacry/auth/pkg/user_v1"
 )
 
 const (
@@ -33,7 +32,7 @@ func main() {
 		}
 	}()
 
-	client := desc.NewUserV1Client(conn)
+	client := user_v1.NewUserV1Client(conn)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
@@ -59,12 +58,12 @@ func main() {
 	}
 }
 
-func createUser(ctx context.Context, client desc.UserV1Client) (*desc.CreateUserResponse, error) {
-	createResponse, err := client.CreateUser(ctx, &desc.CreateUserRequest{
-		Info: &desc.UserInfo{
+func createUser(ctx context.Context, client user_v1.UserV1Client) (*user_v1.CreateUserResponse, error) {
+	createResponse, err := client.CreateUser(ctx, &user_v1.CreateUserRequest{
+		Info: &user_v1.UserInfo{
 			Name:  gofakeit.Name(),
 			Email: gofakeit.Email(),
-			Role:  desc.Role_USER,
+			Role:  user_v1.Role_USER,
 		},
 		Password:        pass,
 		PasswordConfirm: pass,
@@ -81,8 +80,8 @@ func createUserError(err error) error {
 	return fmt.Errorf("failed to create user: %v", err)
 }
 
-func getUser(ctx context.Context, client desc.UserV1Client) (*desc.GetUserResponse, error) {
-	getResponse, err := client.GetUser(ctx, &desc.GetUserRequest{Id: userID})
+func getUser(ctx context.Context, client user_v1.UserV1Client) (*user_v1.GetUserResponse, error) {
+	getResponse, err := client.GetUser(ctx, &user_v1.GetUserRequest{Id: userID})
 	if err != nil {
 		return nil, getUserError(err)
 	}
@@ -95,12 +94,12 @@ func getUserError(err error) error {
 	return fmt.Errorf("failed to get user by id: %v", err)
 }
 
-func updateUser(ctx context.Context, client desc.UserV1Client) error {
-	_, err := client.UpdateUser(ctx, &desc.UpdateUserRequest{
-		Info: &desc.UpdateUserInfo{
+func updateUser(ctx context.Context, client user_v1.UserV1Client) error {
+	_, err := client.UpdateUser(ctx, &user_v1.UpdateUserRequest{
+		Info: &user_v1.UpdateUserInfo{
 			Id:   userID,
 			Name: wrapperspb.String(gofakeit.Name()),
-			Role: desc.Role_USER,
+			Role: user_v1.Role_USER,
 		},
 	})
 	if err != nil {
@@ -114,8 +113,8 @@ func updateUserError(err error) error {
 	return fmt.Errorf("failed to update user: %v", err)
 }
 
-func deleteUser(ctx context.Context, client desc.UserV1Client) error {
-	_, err := client.DeleteUser(ctx, &desc.DeleteUserRequest{
+func deleteUser(ctx context.Context, client user_v1.UserV1Client) error {
+	_, err := client.DeleteUser(ctx, &user_v1.DeleteUserRequest{
 		Id: userID,
 	})
 	if err != nil {

@@ -3,7 +3,7 @@ FROM golang:1.22.5-alpine AS builder
 COPY .. /github.com/travacry/auth/grpc/source/
 WORKDIR /github.com/travacry/auth/grpc/source/
 
-RUN go mod download
+RUN go mod tidy && go mod download
 RUN go build -o ./bin/crud_server cmd/grpc_server/main.go
 
 FROM alpine:latest
