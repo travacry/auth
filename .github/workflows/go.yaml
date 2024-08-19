@@ -105,9 +105,9 @@ jobs:
         run: |
           TAG_NAME=$(echo $GITHUB_SHA | head -c7) # Извлекаем первые 7 символов SHA коммита для создания тега образа.
           docker buildx create --use # Создаем и используем buildx-билдер.
-          docker buildx build --push --cache-from=type=registry,ref=$REGISTRY/$IMAGE_NAME:cache \ 
+          docker buildx build --push --cache-from=type=registry,ref="$REGISTRY"/"$IMAGE_NAME":cache \ 
           --cache-to=type=inline \ # Кэшируем слои Docker для использования в будущих сборках.
-          --tag $REGISTRY/$IMAGE_NAME:$TAG_NAME -f Dockerfile .
+          --tag "$REGISTRY"/"$IMAGE_NAME":"$TAG_NAME" -f Dockerfile .
 
   deploy-image:
     runs-on: ubuntu-latest
@@ -134,10 +134,8 @@ jobs:
 
           script: |
             TAG_NAME=$(echo $GITHUB_SHA | head -c7) # Извлекаем первые 7 символов SHA коммита для использования в имени контейнера.
-
             # Входим в Docker Registry на сервере, используя --password-stdin для передачи пароля безопасным образом.
-            echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USERNAME" --password-stdin "$REGISTRY" || exit 1
-            
-            docker stop $CONTAINER_NAME # Останавливаем работающий контейнер.
-            docker rm $CONTAINER_NAME # Удаляем старый контейнер, чтобы освободить место для нового.
-            docker run -d -p 50051:50051 --name $CONTAINER_NAME -t $REGISTRY/$IMAGE_NAME:$TAG_NAME # Запускаем новый контейнер из свежесобранного образа.
+            echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USERNAME" --password-stdin "$REGISTRY" || exit 1            
+            docker stop "$CONTAINER_NAME" # Останавливаем работающий контейнер.
+            docker rm "$CONTAINER_NAME" # Удаляем старый контейнер, чтобы освободить место для нового.
+            docker run -d -p 50051:50051 --name "$CONTAINER_NAME" -t "$REGISTRY"/"$IMAGE_NAME":"$TAG_NAME" # Запускаем новый контейнер из свежесобранного образа.
