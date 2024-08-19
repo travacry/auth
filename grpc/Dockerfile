@@ -1,6 +1,6 @@
 FROM golang:1.22.5-alpine AS builder
 
-COPY .. /github.com/travacry/auth/grpc/source/
+# Устанавливаем рабочую директорию
 WORKDIR /github.com/travacry/auth/grpc/source/
 
 # Копируем файлы go.mod и go.sum в контейнер
@@ -19,6 +19,9 @@ RUN cat go.sum
 
 # Скачиваем зависимости
 RUN go mod download
+
+# Копируем оставшиеся файлы проекта
+COPY . .
 
 RUN go build -o ./bin/crud_server cmd/grpc_server/main.go
 
