@@ -6,10 +6,6 @@ on:
   pull_request:
     branches: [ main, master ]
 
-env:
-  IMAGE_NAME: "auth-server"
-  CONTAINER_NAME: "auth-server-container"
-
 jobs:
   linter:
     name: lint
@@ -98,9 +94,9 @@ jobs:
         run: |
           TAG_NAME=$(echo $GITHUB_SHA | head -c7) # Извлекаем первые 7 символов SHA коммита для создания тега образа.
           docker buildx create --use # Создаем и используем buildx-билдер.
-          docker buildx build --push --cache-from=type=registry,ref=${{ secrets.REGISTRY }}/$IMAGE_NAME:cache \ 
+          docker buildx build --push --cache-from=type=registry,ref=${{ secrets.REGISTRY }}/${{ secrets.IMAGE_NAME }}:cache \ 
           --cache-to=type=inline \ # Кэшируем слои Docker для использования в будущих сборках.
-          --tag ${{ secrets.REGISTRY }}/$IMAGE_NAME:$TAG_NAME -f Dockerfile .
+          --tag ${{ secrets.REGISTRY }}/${{ secrets.IMAGE_NAME }}:$TAG_NAME -f Dockerfile .
 
   deploy-image:
     runs-on: ubuntu-latest
@@ -117,13 +113,13 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }} # Имя пользователя для SSH-подключения.
           key: ${{ secrets.SSHKEY }} # Приватный SSH-ключ для аутентификации. Хранится в секрете репозитория.
           known_hosts: ${{ secrets.KNOWN_HOSTS }} # Список известных хостов для предотвращения MITM-атак (атаки "человек посередине").
-          envs: IMAGE_NAME,${{ secrets.REGISTRY }},GITHUB_SHA,CONTAINER_NAME # Передаем переменные окружения для использования в скрипте.
+          envs: IMAGE_NAME,${{ secrets.REGISTRY }},GITHUB_SHA,${{ secrets.CONTAINER_NAME }}# Передаем переменные окружения для использования в скрипте.
           script: |
             TAG_NAME=$(echo $GITHUB_SHA | head -c7) # Извлекаем первые 7 символов SHA коммита для использования в имени контейнера.
             docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} ${{ secrets.REGISTRY }} # Входим в Docker Registry на сервере.
-            docker stop $CONTAINER_NAME # Останавливаем работающий контейнер.
-            docker rm $CONTAINER_NAME # Удаляем старый контейнер, чтобы освободить место для нового.
-            docker run -d -p 50051:50051 --name $CONTAINER_NAME -t ${{ secrets.REGISTRY }}/$IMAGE_NAME:$TAG_NAME # Запускаем новый контейнер из свежесобранного образа.
+            docker stop ${{ secrets.CONTAINER_NAME }} # Останавливаем работающий контейнер.
+            docker rm ${{ secrets.CONTAINER_NAME }} # Удаляем старый контейнер, чтобы освободить место для нового.
+            docker run -d -p 50051:50051 --name ${{ secrets.CONTAINER_NAME }} -t ${{ secrets.REGISTRY }}/${{ secrets.IMAGE_NAME }}:$TAG_NAME # Запускаем новый контейнер из свежесобранного образа.
 
 
   
