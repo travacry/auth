@@ -7,7 +7,7 @@ WORKDIR /github.com/travacry/auth
 COPY go.mod go.sum ./grpc/source/
 
 # Копируем остальной код проекта
-COPY grpc/source/ ./grpc/source/
+COPY grpc/ ./grpc/source/
 
 # Переход в директорию с исходным кодом
 WORKDIR /github.com/travacry/auth/grpc/source/
