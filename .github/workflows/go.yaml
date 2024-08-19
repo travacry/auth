@@ -94,10 +94,9 @@ jobs:
           REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
 
         run: |
-          echo "REGISTRY: $REGISTRY"
-          echo "REGISTRY_USERNAME: $REGISTRY_USERNAME"
-          echo "REGISTRY_PASSWORD is set: [${REGISTRY_PASSWORD:+true}]"
+          set -x
           echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USERNAME" --password-stdin "$REGISTRY" || exit 1
+          set +x
           
 
       # Сборка и пуш Docker-образа. В этом шаге:
