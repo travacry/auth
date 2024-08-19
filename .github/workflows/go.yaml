@@ -7,7 +7,6 @@ on:
     branches: [ main, master ]
 
 env:
-  REGISTRY: "cr.selcloud.ru/alex"
   IMAGE_NAME: "auth-server"
   CONTAINER_NAME: "auth-server-container"
 
@@ -88,7 +87,7 @@ jobs:
       # Вход в Docker Registry (регистр контейнеров) с использованием учетных данных, хранящихся в секретах репозитория.
       # Это необходимо для того, чтобы мы могли запушить (отправить) созданный Docker-образ в регистр.
       - name: Login to Docker Registry
-        run: docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
+        run: docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} ${{ secrets.REGISTRY }}
 
       # Сборка и пуш Docker-образа. В этом шаге:
       # 1. Определяется тег для образа на основе первых 7 символов SHA коммита.
@@ -99,9 +98,9 @@ jobs:
         run: |
           TAG_NAME=$(echo $GITHUB_SHA | head -c7) # Извлекаем первые 7 символов SHA коммита для создания тега образа.
           docker buildx create --use # Создаем и используем buildx-билдер.
-          docker buildx build --push --cache-from=type=registry,ref=$REGISTRY/$IMAGE_NAME:cache \ 
+          docker buildx build --push --cache-from=type=registry,ref=${{ secrets.REGISTRY }}/$IMAGE_NAME:cache \ 
           --cache-to=type=inline \ # Кэшируем слои Docker для использования в будущих сборках.
-          --tag $REGISTRY/$IMAGE_NAME:$TAG_NAME -f Dockerfile .
+          --tag ${{ secrets.REGISTRY }}/$IMAGE_NAME:$TAG_NAME -f Dockerfile .
 
   deploy-image:
     runs-on: ubuntu-latest
@@ -118,13 +117,13 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }} # Имя пользователя для SSH-подключения.
           key: ${{ secrets.SSHKEY }} # Приватный SSH-ключ для аутентификации. Хранится в секрете репозитория.
           known_hosts: ${{ secrets.KNOWN_HOSTS }} # Список известных хостов для предотвращения MITM-атак (атаки "человек посередине").
-          envs: IMAGE_NAME,REGISTRY,GITHUB_SHA,CONTAINER_NAME # Передаем переменные окружения для использования в скрипте.
+          envs: IMAGE_NAME,${{ secrets.REGISTRY }},GITHUB_SHA,CONTAINER_NAME # Передаем переменные окружения для использования в скрипте.
           script: |
             TAG_NAME=$(echo $GITHUB_SHA | head -c7) # Извлекаем первые 7 символов SHA коммита для использования в имени контейнера.
-            docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY # Входим в Docker Registry на сервере.
+            docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} ${{ secrets.REGISTRY }} # Входим в Docker Registry на сервере.
             docker stop $CONTAINER_NAME # Останавливаем работающий контейнер.
             docker rm $CONTAINER_NAME # Удаляем старый контейнер, чтобы освободить место для нового.
-            docker run -d -p 50051:50051 --name $CONTAINER_NAME -t $REGISTRY/$IMAGE_NAME:$TAG_NAME # Запускаем новый контейнер из свежесобранного образа.
+            docker run -d -p 50051:50051 --name $CONTAINER_NAME -t ${{ secrets.REGISTRY }}/$IMAGE_NAME:$TAG_NAME # Запускаем новый контейнер из свежесобранного образа.
 
 
   
