@@ -88,16 +88,8 @@ jobs:
       # Вход в Docker Registry (регистр контейнеров) с использованием учетных данных, хранящихся в секретах репозитория.
       # Это необходимо для того, чтобы мы могли запушить (отправить) созданный Docker-образ в регистр.
       - name: Login to Docker Registry
-        env:
-          REGISTRY: ${{ secrets.REGISTRY }}
-          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
-          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
-
-        run: |
-          set -x
-          echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USERNAME" --password-stdin "$REGISTRY" || exit 1
-          set +x
-          
+        run: |        
+          echo ${{ secrets.REGISTRY_PASSWORD }} | docker login -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin ${{ secrets.REGISTRY }} || exit 1                  
 
       # Сборка и пуш Docker-образа. В этом шаге:
       # 1. Определяется тег для образа на основе первых 7 символов SHA коммита.
