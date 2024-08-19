@@ -2,66 +2,131 @@ name: Go
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, week_2 ]
   pull_request:
     branches: [ main, master ]
 
+env:
+  REGISTRY: "cr.selcloud.ru/alex"
+  IMAGE_NAME: "auth-server"
+  CONTAINER_NAME: "auth-server-container"
+
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-    steps:
-        - uses: actions/checkout@v3
-
-        - name: Set up Go
-          uses: actions/setup-go@v4
-          with:
-            go-version: '1.22'
-            cache-dependency-path: go.sum
-
-        - name: Build
-          run: go build -o ./bin/ -v ./...
-
-        - name: Test
-          run: go test -v ./...
-
   linter:
     name: lint
     runs-on: ubuntu-latest
     steps:
+      # Шаг для клонирования (скачивания) кода из репозитория GitHub.
       - uses: actions/checkout@v3
+
+      # Устанавливаем Go версии 1.22. Это необходимо для запуска Go-команд и линтера.
       - uses: actions/setup-go@v4
         with:
           go-version: '1.22'
-          cache: false
+
+      # Запускаем golangci-lint для проверки кода.
+      # GolangCI-Lint — это инструмент для статического анализа кода Go, который помогает находить ошибки,
+      # проблемы с производительностью, возможные баги и несоответствия стилю кода.
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
-          # Require: The version of golangci-lint to use.
-          # When `install-mode` is `binary` (default) the value can be v1.2 or v1.2.3 or `latest` to use the latest version.
-          # When `install-mode` is `goinstall` the value can be v1.2.3, `latest`, or the hash of a commit.
-          version: v1.59
+          version: v1.59  # Указываем конкретную версию линтера для стабильности результатов.
+          args: --timeout=15m --config=./.golangci.pipeline.yaml --issues-exit-code=0
+          # --timeout=15m: Устанавливаем максимальное время работы линтера на 15 минут.
+          # --config=./.golangci.pipeline.yaml: Указываем путь к файлу конфигурации линтера.
+          # --issues-exit-code=0: Линтер не завершает работу с ошибкой, даже если найдены проблемы, чтобы не прерывать workflow.
 
-          # Optional: working directory, useful for monorepos
-          # working-directory: somedir
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      # Клонируем код из репозитория.
+      - uses: actions/checkout@v3
 
-          # Optional: golangci-lint command line arguments.
-          #
-          # Note: By default, the `.golangci.yml` file should be at the root of the repository.
-          # The location of the configuration file can be changed by using `--config=`
-          args: --timeout=30m --config=./.golangci.pipeline.yaml --issues-exit-code=0
+      # Устанавливаем Go версии 1.22. Эта версия нужна для сборки и тестирования Go-кода.
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22'
+          cache-dependency-path: go.sum  # Указываем файл go.sum для кэширования зависимостей. Это ускоряет повторные сборки.
 
-          # Optional: show only new issues if it's a pull request. The default value is `false`.
-          # only-new-issues: true
+      # Кэширование сборки Go и зависимостей для ускорения процесса сборки.
+      # Этот шаг сохранит скомпилированные файлы и скачанные зависимости, чтобы использовать их в будущих запусках,
+      # что значительно уменьшит время сборки в случае небольших изменений в коде.
+      - name: Cache Go build
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build # Кэшируем скомпилированные файлы Go.
+            ~/go/pkg/mod       # Кэшируем модули Go, чтобы не скачивать их каждый раз заново.
+          key: ${{ runner.os }}-go-build-${{ hashFiles('**/go.sum') }} # Используем хеш файлов для уникальности ключа.
+          restore-keys: |
+            ${{ runner.os }}-go-build- # Восстанавливаем кэш по основному ключу или по схожему.
 
-          # Optional: if set to true, then all caching functionality will be completely disabled,
-          #           takes precedence over all other caching options.
-          # skip-cache: true
+      # Сборка Go-приложения. Эта команда компилирует код и создает исполняемый файл в директории ./bin/.
+      - name: Build
+        run: go build -o ./bin/ -v ./...
 
-          # Optional: if set to true, then the action won't cache or restore ~/go/pkg.
-          # skip-pkg-cache: true
+      # Запуск тестов для проверки того, что код работает правильно.
+      # Этот шаг выполняет все тесты, написанные в проекте, и выводит результаты в лог.
+      - name: Test
+        run: go test -v ./...
 
-          # Optional: if set to true, then the action won't cache or restore ~/.cache/go-build.
-          # skip-build-cache: true
+  image-build-and-push:
+    runs-on: ubuntu-latest
+    needs: build-and-test # Эта job зависит от успешного завершения build-and-test, так как нам нужно быть уверенными, что код компилируется и проходит тесты перед созданием Docker-образа.
 
-          # Optional: The mode to install golangci-lint. It can be 'binary' or 'goinstall'.
-          # install-mode: "goinstall"
+    steps:
+      # Клонируем код из ветки master, чтобы убедиться, что у нас самая свежая версия кода.
+      - name: Checkout master
+        uses: actions/checkout@v3
+
+      # Настраиваем Docker Buildx, что позволяет нам использовать улучшенные функции сборки Docker,
+      # такие как многоплатформенная сборка и кэширование.
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # Вход в Docker Registry (регистр контейнеров) с использованием учетных данных, хранящихся в секретах репозитория.
+      # Это необходимо для того, чтобы мы могли запушить (отправить) созданный Docker-образ в регистр.
+      - name: Login to Docker Registry
+        run: docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
+
+      # Сборка и пуш Docker-образа. В этом шаге:
+      # 1. Определяется тег для образа на основе первых 7 символов SHA коммита.
+      # 2. Создается и используется buildx для сборки образа.
+      # 3. Docker-образ собирается и отправляется в регистр.
+      # 4. Включено кэширование слоёв Docker для ускорения последующих сборок.
+      - name: Build and Push Docker Image
+        run: |
+          TAG_NAME=$(echo $GITHUB_SHA | head -c7) # Извлекаем первые 7 символов SHA коммита для создания тега образа.
+          docker buildx create --use # Создаем и используем buildx-билдер.
+          docker buildx build --push --cache-from=type=registry,ref=$REGISTRY/$IMAGE_NAME:cache \ 
+          --cache-to=type=inline \ # Кэшируем слои Docker для использования в будущих сборках.
+          --tag $REGISTRY/$IMAGE_NAME:$TAG_NAME -f Dockerfile .
+
+  deploy-image:
+    runs-on: ubuntu-latest
+    needs: image-build-and-push # Эта job зависит от успешного завершения image-build-and-push, так как для развертывания нужен новый Docker-образ.
+
+    steps:
+      # Деплой на сервер Cloud с использованием SSH.
+      # SSH позволяет удаленно подключаться к серверу и выполнять команды на нем.
+      # Здесь используется действие appleboy/ssh-action для упрощения этого процесса.
+      - name: Deploy to Selectel Cloud via SSH action
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_HOST }} # Хост сервера, на который будет производиться деплой.
+          username: ${{ secrets.SSH_USERNAME }} # Имя пользователя для SSH-подключения.
+          key: ${{ secrets.SSHKEY }} # Приватный SSH-ключ для аутентификации. Хранится в секрете репозитория.
+          known_hosts: ${{ secrets.KNOWN_HOSTS }} # Список известных хостов для предотвращения MITM-атак (атаки "человек посередине").
+          envs: IMAGE_NAME,REGISTRY,GITHUB_SHA,CONTAINER_NAME # Передаем переменные окружения для использования в скрипте.
+          script: |
+            TAG_NAME=$(echo $GITHUB_SHA | head -c7) # Извлекаем первые 7 символов SHA коммита для использования в имени контейнера.
+            docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY # Входим в Docker Registry на сервере.
+            docker stop $CONTAINER_NAME # Останавливаем работающий контейнер.
+            docker rm $CONTAINER_NAME # Удаляем старый контейнер, чтобы освободить место для нового.
+            docker run -d -p 50051:50051 --name $CONTAINER_NAME -t $REGISTRY/$IMAGE_NAME:$TAG_NAME # Запускаем новый контейнер из свежесобранного образа.
+
+
+  
+
+  
