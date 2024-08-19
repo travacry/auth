@@ -117,7 +117,7 @@ jobs:
             --cache-from=type=registry,ref="$REGISTRY/$IMAGE_NAME:cache" \
             --cache-to=type=inline \
             --tag "$REGISTRY/$IMAGE_NAME:$TAG_NAME" \
-            -f Dockerfile .
+            -f grpc/Dockerfile grpc/
 
   deploy-image:
     runs-on: ubuntu-latest
