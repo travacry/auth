@@ -31,7 +31,7 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           version: v1.59  # Указываем конкретную версию линтера для стабильности результатов.
-          args: --timeout=15m --config=./.golangci.pipeline.yaml --issues-exit-code=0
+          args: --timeout=15m --config=./grpc/.golangci.pipeline.yaml --issues-exit-code=0
           # --timeout=15m: Устанавливаем максимальное время работы линтера на 15 минут.
           # --config=./.golangci.pipeline.yaml: Указываем путь к файлу конфигурации линтера.
           # --issues-exit-code=0: Линтер не завершает работу с ошибкой, даже если найдены проблемы, чтобы не прерывать workflow.
