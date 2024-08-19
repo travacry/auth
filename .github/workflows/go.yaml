@@ -104,10 +104,20 @@ jobs:
       - name: Build and Push Docker Image
         run: |
           TAG_NAME=$(echo $GITHUB_SHA | head -c7) # Извлекаем первые 7 символов SHA коммита для создания тега образа.
+          
+          # Проверяем, что переменные не пустые
+          if [ -z "$REGISTRY" ] || [ -z "$IMAGE_NAME" ]; then
+            echo "Error: REGISTRY or IMAGE_NAME is not set."
+            exit 1
+          fi
+          
           docker buildx create --use # Создаем и используем buildx-билдер.
-          docker buildx build --push --cache-from=type=registry,ref="$REGISTRY"/"$IMAGE_NAME":cache \ 
-          --cache-to=type=inline \ # Кэшируем слои Docker для использования в будущих сборках.
-          --tag "$REGISTRY"/"$IMAGE_NAME":"$TAG_NAME" -f Dockerfile .
+          
+          docker buildx build --push \
+            --cache-from=type=registry,ref="$REGISTRY/$IMAGE_NAME:cache" \
+            --cache-to=type=inline \
+            --tag "$REGISTRY/$IMAGE_NAME:$TAG_NAME" \
+            -f Dockerfile .
 
   deploy-image:
     runs-on: ubuntu-latest
