@@ -117,7 +117,6 @@ jobs:
           host: ${{ secrets.SERVER_HOST }} # Хост сервера, на который будет производиться деплой.
           username: ${{ secrets.SSH_USERNAME }} # Имя пользователя для SSH-подключения.
           key: ${{ secrets.SSHKEY }} # Приватный SSH-ключ для аутентификации. Хранится в секрете репозитория.
-          known_hosts: ${{ secrets.KNOWN_HOSTS }} # Список известных хостов для предотвращения MITM-атак (атаки "человек посередине").
           envs: ${{ secrets.IMAGE_NAME }},${{ secrets.REGISTRY }},${{ secrets.CONTAINER_NAME }},${{ secrets.REGISTRY_PASSWORD }},${{ secrets.REGISTRY_USERNAME }} # Передаем переменные окружения для использования в скрипте.
           script: |
             TAG_NAME=$(echo $GITHUB_SHA | head -c7) # Извлекаем первые 7 символов SHA коммита для использования в имени контейнера.
