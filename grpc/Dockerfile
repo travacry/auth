@@ -3,7 +3,23 @@ FROM golang:1.22.5-alpine AS builder
 COPY .. /github.com/travacry/auth/grpc/source/
 WORKDIR /github.com/travacry/auth/grpc/source/
 
-RUN go mod tidy && go mod download
+# Копируем файлы go.mod и go.sum в контейнер
+COPY go.mod go.sum ./
+
+# Настройка окружения
+ENV GO111MODULE=on
+ENV GOPROXY=https://proxy.golang.org,direct
+
+# Выполняем go mod tidy
+RUN go mod tidy
+
+# Проверка состояния после go mod tidy
+RUN cat go.mod
+RUN cat go.sum
+
+# Скачиваем зависимости
+RUN go mod download
+
 RUN go build -o ./bin/crud_server cmd/grpc_server/main.go
 
 FROM alpine:latest
