@@ -4,7 +4,7 @@ install-golangci-lint:
 	GOBIN=$(LOCAL_BIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.59.1
 
 lint:
-	GOBIN=$(LOCAL_BIN) golangci-lint run ./... --config .golangci.pipeline.yaml --fix
+	GOBIN=$(LOCAL_BIN) golangci-lint run ./... --config ./grpc/.golangci.pipeline.yaml --fix
 
 install-deps:
 	GOBIN=$(LOCAL_BIN) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.1
@@ -25,3 +25,14 @@ generate-user-api:
 	--go-grpc_out=pkg/user_v1 --go-grpc_opt=paths=source_relative \
 	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc \
 	api/user_v1/user.proto
+
+build:
+	GOOS=linux GOARCH=amd64 go build -o service_linux cmd/grpc_server/main.go
+
+#copy-to-server:
+#	scp service_linux root@selectel-alex.ssh:
+#
+#docker-build-and-push:
+#	docker buildx build --no-cache --platform linux/amd64 -t cr.selcloud.ru/alex/auth-server:v0.0.1 .
+#	cat private/password | docker login -u token cr.selcloud.ru/alex --password-stdin
+#	docker push cr.selcloud.ru/alex/auth-server:v0.0.1
