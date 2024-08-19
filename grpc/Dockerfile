@@ -18,9 +18,6 @@ RUN cat go.sum
 # Скачиваем зависимости
 RUN go mod download
 
-# Копируем оставшиеся файлы проекта
-COPY . .
-
 RUN go build -o ./bin/crud_server cmd/grpc_server/main.go
 
 FROM alpine:latest
