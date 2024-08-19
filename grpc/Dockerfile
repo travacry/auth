@@ -4,13 +4,13 @@ FROM golang:1.22.5-alpine AS builder
 WORKDIR /github.com/travacry/auth
 
 # Копируем файл go.mod и go.sum
-COPY go.mod go.sum ./grpc/source/
+COPY go.mod go.sum ./grpc/
 
 # Копируем остальной код проекта
-COPY grpc/ ./grpc/source/
+COPY grpc/ ./grpc/
 
 # Переход в директорию с исходным кодом
-WORKDIR /github.com/travacry/auth/grpc/source/
+WORKDIR /github.com/travacry/auth/grpc/
 
 # Настройка окружения
 ENV GO111MODULE=on
@@ -31,6 +31,6 @@ RUN go build -o ./bin/crud_server cmd/grpc_server/main.go
 FROM alpine:latest
 
 WORKDIR /root/
-COPY --from=builder /github.com/travacry/auth/grpc/source/bin/crud_server .
+COPY --from=builder /github.com/travacry/auth/grpc/bin/crud_server .
 
 CMD ["./crud_server"]
