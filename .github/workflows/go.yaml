@@ -130,10 +130,8 @@ jobs:
           host: ${{ secrets.SERVER_HOST }} # Хост сервера, на который будет производиться деплой.
           username: ${{ secrets.SSH_USERNAME }} # Имя пользователя для SSH-подключения.
           key: ${{ secrets.SSHKEY }} # Приватный SSH-ключ для аутентификации. Хранится в секрете репозитория.
-
-
           script: |
-            TAG_NAME=$(echo $GITHUB_SHA | head -c7) # Извлекаем первые 7 символов SHA коммита для использования в имени контейнера.
+            TAG_NAME=$(echo "$GITHUB_SHA" | head -c7) # Извлекаем первые 7 символов SHA коммита для использования в имени контейнера.
             # Входим в Docker Registry на сервере, используя --password-stdin для передачи пароля безопасным образом.
             echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USERNAME" --password-stdin "$REGISTRY" || exit 1            
             docker stop "$CONTAINER_NAME" # Останавливаем работающий контейнер.
