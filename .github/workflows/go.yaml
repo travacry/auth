@@ -112,18 +112,26 @@ jobs:
       # SSH позволяет удаленно подключаться к серверу и выполнять команды на нем.
       # Здесь используется действие appleboy/ssh-action для упрощения этого процесса.
       - name: Deploy to Selectel Cloud via SSH action
+        env:
+          IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
+          REGISTRY: ${{ secrets.REGISTRY }}
+          CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
+          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.SERVER_HOST }} # Хост сервера, на который будет производиться деплой.
           username: ${{ secrets.SSH_USERNAME }} # Имя пользователя для SSH-подключения.
           key: ${{ secrets.SSHKEY }} # Приватный SSH-ключ для аутентификации. Хранится в секрете репозитория.
-          envs: ${{ secrets.IMAGE_NAME }},${{ secrets.REGISTRY }},${{ secrets.CONTAINER_NAME }},${{ secrets.REGISTRY_PASSWORD }},${{ secrets.REGISTRY_USERNAME }} # Передаем переменные окружения для использования в скрипте.
+
+
           script: |
             TAG_NAME=$(echo $GITHUB_SHA | head -c7) # Извлекаем первые 7 символов SHA коммита для использования в имени контейнера.
 
             # Входим в Docker Registry на сервере, используя --password-stdin для передачи пароля безопасным образом.
-            echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login -u "${{ secrets.REGISTRY_USERNAME }}" --password-stdin ${{ secrets.REGISTRY }} || exit 1
-
-            docker stop ${{ secrets.CONTAINER_NAME }} # Останавливаем работающий контейнер.
-            docker rm ${{ secrets.CONTAINER_NAME }} # Удаляем старый контейнер, чтобы освободить место для нового.
-            docker run -d -p 50051:50051 --name ${{ secrets.CONTAINER_NAME }} -t ${{ secrets.REGISTRY }}/${{ secrets.IMAGE_NAME }}:$TAG_NAME # Запускаем новый контейнер из свежесобранного образа.
+            echo $REGISTRY_PASSWORD | docker login -u $REGISTRY_USERNAME --password-stdin $REGISTRY || exit 1
+            
+            docker stop $CONTAINER_NAME # Останавливаем работающий контейнер.
+            docker rm $CONTAINER_NAME # Удаляем старый контейнер, чтобы освободить место для нового.
+            docker run -d -p 50051:50051 --name $CONTAINER_NAME -t $REGISTRY/$IMAGE_NAME:$TAG_NAME # Запускаем новый контейнер из свежесобранного образа.
