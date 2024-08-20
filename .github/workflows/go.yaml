@@ -151,7 +151,7 @@ jobs:
             TAG_NAME=$(echo "$GITHUB_SHA" | head -c7) # Извлекаем первые 7 символов SHA коммита для использования в имени контейнера.
             
             # Входим в Docker Registry на сервере, используя --password-stdin для передачи пароля безопасным образом.
-            echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USERNAME" --password-stdin "$REGISTRY" || exit 1
+            echo "$REGISTRY_PASSWORD" | docker login --username "$REGISTRY_USERNAME" --password-stdin "$REGISTRY" || exit 1
             
             docker stop "$CONTAINER_NAME" # Останавливаем работающий контейнер.
             docker rm "$CONTAINER_NAME" # Удаляем старый контейнер, чтобы освободить место для нового.
