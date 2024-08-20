@@ -16,6 +16,11 @@ jobs:
     name: lint
     runs-on: ubuntu-latest
     steps:
+      - name: Clear cache
+        run: actions/cache@v3
+        with:
+          path: ~/.cache
+
       # Шаг для клонирования (скачивания) кода из репозитория GitHub.
       - uses: actions/checkout@v3
 
