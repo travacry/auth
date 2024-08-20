@@ -160,6 +160,7 @@ jobs:
             export REGISTRY="${{ secrets.REGISTRY }}"
             export CONTAINER_NAME="${{ secrets.CONTAINER_NAME }}"
             export IMAGE_NAME="${{ secrets.IMAGE_NAME }}"
+            export TAG_NAME="${{ env.TAG_NAME }}"
             
             # Проверяем правильность формата TAG_NAME, REGISTRY и IMAGE_NAME
             if [[ -z "$TAG_NAME" ]]; then
