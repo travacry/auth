@@ -2,11 +2,9 @@ name: Go
 
 on:
   push:
-    branches:
-      - master
+    branches: [ master, week_2 ]
   pull_request:
-    branches:
-      - master
+    branches: [ master ]
 
 jobs:
   linter:
