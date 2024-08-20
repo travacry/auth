@@ -61,8 +61,10 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            ~/.cache/go-build # Кэшируем скомпилированные файлы Go.
-            ~/go/pkg/mod       # Кэшируем модули Go, чтобы не скачивать их каждый раз заново.
+            # Кэшируем скомпилированные файлы Go.
+            ~/.cache/go-build
+            # Кэшируем модули Go, чтобы не скачивать их каждый раз заново.
+            ~/go/pkg/mod
           key: ${{ runner.os }}-go-build-${{ hashFiles('grpc/go.sum') }} # Используем хеш файлов для уникальности ключа.
           restore-keys: |
             ${{ runner.os }}-go-build- # Восстанавливаем кэш по основному ключу или по схожему.
@@ -110,7 +112,8 @@ jobs:
       # 4. Включено кэширование слоёв Docker для ускорения последующих сборок.
       - name: Build and Push Docker Image
         run: |
-          TAG_NAME=$(echo $GITHUB_SHA | head -c7) # Извлекаем первые 7 символов SHA коммита для создания тега образа.
+          # Извлекаем первые 7 символов SHA коммита для создания тега образа.
+          TAG_NAME=$(echo $GITHUB_SHA | head -c7)
           
           # Проверяем, что переменные не пустые
           if [ -z "$REGISTRY" ] || [ -z "$IMAGE_NAME" ]; then
@@ -158,8 +161,16 @@ jobs:
             TAG_NAME=$(echo "$GITHUB_SHA" | head -c7)
             
             # Проверяем правильность формата TAG_NAME, REGISTRY и IMAGE_NAME
-            if [[ -z "$TAG_NAME" || -z "$REGISTRY" || -z "$IMAGE_NAME" ]]; then
-              echo "Error: One of the variables TAG_NAME, REGISTRY, or IMAGE_NAME is empty or not set correctly."
+            if [[ -z "$TAG_NAME" ]]; then
+              echo "Error: One of the variable TAG_NAME is empty or not set correctly."
+              exit 1
+            fi
+            if [[ -z "$REGISTRY" ]]; then
+              echo "Error: One of the variable REGISTRY is empty or not set correctly."
+              exit 1
+            fi
+            if [[ -z "$IMAGE_NAME" ]]; then
+              echo "Error: One of the variable IMAGE_NAME is empty or not set correctly."
               exit 1
             fi
       
