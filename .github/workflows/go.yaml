@@ -148,6 +148,12 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }} # Имя пользователя для SSH-подключения.
           key: ${{ secrets.SSHKEY }} # Приватный SSH-ключ для аутентификации. Хранится в секрете репозитория.
           script: |
+            export REGISTRY_PASSWORD="${{ secrets.REGISTRY_PASSWORD }}"
+            export REGISTRY_USERNAME="${{ secrets.REGISTRY_USERNAME }}"
+            export REGISTRY="${{ secrets.REGISTRY }}"
+            export CONTAINER_NAME="${{ secrets.CONTAINER_NAME }}"
+            export IMAGE_NAME="${{ secrets.IMAGE_NAME }}"
+      
             TAG_NAME=$(echo "$GITHUB_SHA" | head -c7) # Извлекаем первые 7 символов SHA коммита для использования в имени контейнера.
             
             # Входим в Docker Registry на сервере, используя --password-stdin для передачи пароля безопасным образом.
