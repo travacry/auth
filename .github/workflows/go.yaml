@@ -150,6 +150,8 @@ jobs:
           host: ${{ secrets.SERVER_HOST }} # Хост сервера, на который будет производиться деплой.
           username: ${{ secrets.SSH_USERNAME }} # Имя пользователя для SSH-подключения.
           key: ${{ secrets.SSHKEY }} # Приватный SSH-ключ для аутентификации. Хранится в секрете репозитория.
+          envs:
+            GITHUB_SHA: ${{ github.sha }}
           script: |
             export REGISTRY_PASSWORD="${{ secrets.REGISTRY_PASSWORD }}"
             export REGISTRY_USERNAME="${{ secrets.REGISTRY_USERNAME }}"
