@@ -1,4 +1,4 @@
-module github.com/travacry/auth
+module github.com/travacry/auth/grpc
 
 go 1.22
 
