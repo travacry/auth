@@ -16,11 +16,6 @@ jobs:
     name: lint
     runs-on: ubuntu-latest
     steps:
-      - name: Clear cache
-        run: actions/cache@v3
-        with:
-          path: ~/.cache
-
       # Шаг для клонирования (скачивания) кода из репозитория GitHub.
       - uses: actions/checkout@v3
 
@@ -28,6 +23,12 @@ jobs:
       - uses: actions/setup-go@v4
         with:
           go-version: '1.22'
+
+      # Очистка кеша перед запуском линтера
+      - name: Clear Golangci-lint cache
+        run: |
+          sudo rm -rf ~/.cache/golangci-lint
+          echo "Golangci-lint cache cleared."
 
       # Запускаем golangci-lint для проверки кода.
       # GolangCI-Lint — это инструмент для статического анализа кода Go, который помогает находить ошибки,
