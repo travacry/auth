@@ -153,12 +153,23 @@ jobs:
             export REGISTRY="${{ secrets.REGISTRY }}"
             export CONTAINER_NAME="${{ secrets.CONTAINER_NAME }}"
             export IMAGE_NAME="${{ secrets.IMAGE_NAME }}"
-      
-            TAG_NAME=$(echo "$GITHUB_SHA" | head -c7) # Извлекаем первые 7 символов SHA коммита для использования в имени контейнера.
             
+            # Извлекаем первые 7 символов SHA коммита для использования в имени контейнера.
+            TAG_NAME=$(echo "$GITHUB_SHA" | head -c7)
+            
+            # Проверяем правильность формата TAG_NAME, REGISTRY и IMAGE_NAME
+            if [[ -z "$TAG_NAME" || -z "$REGISTRY" || -z "$IMAGE_NAME" ]]; then
+              echo "Error: One of the variables TAG_NAME, REGISTRY, or IMAGE_NAME is empty or not set correctly."
+              exit 1
+            fi
+      
             # Входим в Docker Registry на сервере, используя --password-stdin для передачи пароля безопасным образом.
             echo "$REGISTRY_PASSWORD" | docker login --username "$REGISTRY_USERNAME" --password-stdin "$REGISTRY" || exit 1
             
-            docker stop "$CONTAINER_NAME" # Останавливаем работающий контейнер.
-            docker rm "$CONTAINER_NAME" # Удаляем старый контейнер, чтобы освободить место для нового.
-            docker run -d -p 50051:50051 --name "$CONTAINER_NAME" -t "$REGISTRY"/"$IMAGE_NAME":"$TAG_NAME" # Запускаем новый контейнер из свежесобранного образа.
+            # Останавливаем работающий контейнер.
+            docker stop "$CONTAINER_NAME" || true
+            # Удаляем старый контейнер, чтобы освободить место для нового.
+            docker rm -f "$CONTAINER_NAME" || true
+            
+            # Запускаем новый контейнер из свежесобранного образа.
+            docker run -d -p 50051:50051 --name "$CONTAINER_NAME" -t "$REGISTRY"/"$IMAGE_NAME":"$TAG_NAME"
