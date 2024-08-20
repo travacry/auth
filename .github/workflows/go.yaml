@@ -3,16 +3,14 @@ name: Go
 on:
   push:
     branches:
-      - main
       - master
-      - week_2
   pull_request:
     branches:
-      - main
       - master
 
 jobs:
   linter:
+    if: github.event_name == 'push'
     name: lint
     runs-on: ubuntu-latest
     steps:
@@ -41,6 +39,7 @@ jobs:
         working-directory: grpc  # Указываем рабочий каталог
 
   build-and-test:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     needs: linter
     steps:
@@ -81,6 +80,7 @@ jobs:
         run: go test -v ./...
 
   image-build-and-push:
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     needs: build-and-test # Эта job зависит от успешного завершения build-and-test, так как нам нужно быть уверенными, что код компилируется и проходит тесты перед созданием Docker-образа.
     env:
@@ -130,6 +130,7 @@ jobs:
             -f grpc/Dockerfile grpc/
 
   deploy-image:
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     needs: image-build-and-push # Эта job зависит от успешного завершения image-build-and-push, так как для развертывания нужен новый Docker-образ.
 
